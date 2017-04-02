@@ -5,40 +5,48 @@ var BUILD_DIR = path.resolve(__dirname, 'src/client/public/');
 var APP_DIR = path.resolve(__dirname, 'src/client/');
 
 var config = {
-    contentBase: './src/client',
-    devtool: 'cheap-module-source-map',
+    context: APP_DIR,
+    devtool: 'eval-source-map',
     entry :[
-        // 'webpack/hot/dev-server',
         path.resolve(APP_DIR, 'main.js')
     ]
     ,
     output: {
         path: BUILD_DIR,
-        publicPath: '/public/',
+        publicPath: './public/',
         filename: 'bundle.js'
     },
     module: {
         loaders: [
             {
                 test: /\.jsx?$/,
-                loader: 'babel',
-                exclude: /node_modules/,
-                query: {
-                    presets: ['es2015', 'stage-2', 'react']
-                }
+                loader: 'babel-loader',
+                exclude: /node_modules/
+            },
+            {
+                test: /\.s?css$/,
+                loader: "style-loader!css-loader?sourceMap&localIdentName=[local]--[hash:base64:5]!sass-loader",
+            }, {
+                test: /\.(jpg|png|gif)$/,
+                use: 'file-loader'
             }
         ]
     },
     plugins:[
-        new webpack.DefinePlugin({
-            'process.env':{
-                'NODE_ENV': JSON.stringify('production')
-            }
+        new webpack.LoaderOptionsPlugin({
+            minimize: true,
+            debug: false
         }),
         new webpack.optimize.UglifyJsPlugin({
-            compress:{
-                warnings: true
-            }
+            beautify: false,
+            mangle: {
+                screw_ie8: true,
+                keep_fnames: true
+            },
+            compress: {
+                screw_ie8: true
+            },
+            comments: false
         })
     ]
 };
